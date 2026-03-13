@@ -1,7 +1,5 @@
 // ============================================================
 // imm_gen_tb.sv
-// Feeds specific instructions to the Immediate Generator to verify
-// everything sign-extends perfectly.
 // ============================================================
 
 `include "opcode.vh"
@@ -20,14 +18,14 @@ module imm_gen_tb;
     integer pass_count;
     integer fail_count;
 
-    // A simple task to check if our module got the right answer
+
     task check(
         input [31:0]  instr,
         input [31:0]  expected,
         input string  test_name
     );
         instruction = instr;
-        #10; // Let the signals settle
+        #10; 
 
         if (immediate === expected) begin
             $display("[PASS] %s", test_name);
@@ -38,7 +36,6 @@ module imm_gen_tb;
         end
     endtask
 
-    // Helpers to quickly build instructions 
     function automatic [31:0] encode_itype(input [11:0] imm, input [4:0] rs1, input [2:0] f3, input [4:0] rd, input [6:0] opc);
         encode_itype = {imm, rs1, f3, rd, opc};
     endfunction
@@ -86,7 +83,8 @@ module imm_gen_tb;
 
         $display("\n--- Results ---");
         $display("Passed: %0d | Failed: %0d", pass_count, fail_count);
-        if (fail_count == 0) $display("All tests passed! You're good to go.");
+        if (fail_count == 0) $display("All tests passed!");
+        else $display("%0d test(s) failed.", fail_count);
         
         $finish;
     end
