@@ -1,50 +1,36 @@
 // ============================================================
 // alu.sv
-// 32-bit Arithmetic Logic Unit (ALU)
+// ALU Module for EE-475L Lab 2
+// Supports 10 operations: AND, OR, ADD, XOR, SLL, SRL, SUB, SLT, SRA, SLTU
 // ============================================================
 
-`include "opcode.vh"
+`timescale 1ns/1ps
 
-module alu (
-    input  logic [31:0] operand1,
-    input  logic [31:0] operand2,
-    input  logic [3:0]  alu_operation,
-
-    output logic [31:0] result,
-    output logic        zero
+module alu(
+    input  logic [31:0] operand1,      // First operand
+    input  logic [31:0] operand2,      // Second operand
+    input  logic [3:0]  alu_operation, // Operation code
+    output logic [31:0] result,        // ALU result
+    output logic        zero           // Zero flag
 );
 
-    // shift amount
-    logic [4:0] shamt;
-    assign shamt = operand2[4:0];
-
-    // signed values for SLT
-    logic signed [31:0] signed_op1;
-    logic signed [31:0] signed_op2;
-    assign signed_op1 = $signed(operand1);
-    assign signed_op2 = $signed(operand2);
-
     always_comb begin
-        result = 32'b0;
-
         case (alu_operation)
-
-            4'b0000: result = operand1 & operand2;                 // AND
-            4'b0001: result = operand1 | operand2;                 // OR
-            4'b0010: result = operand1 + operand2;                 // ADD
-            4'b0011: result = operand1 ^ operand2;                 // XOR
-            4'b0100: result = operand1 << shamt;                   // SLL
-            4'b0101: result = operand1 >> shamt;                   // SRL
-            4'b0110: result = operand1 - operand2;                 // SUB
-            4'b0111: result = (signed_op1 < signed_op2) ? 32'd1 : 32'd0; // SLT
-            4'b1000: result = $signed(operand1) >>> shamt;         // SRA
-
-            default: result = 32'b0;
-
+            4'b0000: result = operand1 & operand2;                     // AND
+            4'b0001: result = operand1 | operand2;                     // OR
+            4'b0010: result = operand1 + operand2;                     // ADD
+            4'b0011: result = operand1 ^ operand2;                     // XOR
+            4'b0100: result = operand1 << operand2[4:0];               // SLL
+            4'b0101: result = operand1 >> operand2[4:0];               // SRL (logical)
+            4'b0110: result = operand1 - operand2;                     // SUB
+            4'b0111: result = ($signed(operand1) < $signed(operand2)) ? 32'd1 : 32'd0; // SLT signed
+            4'b1000: result = $signed(operand1) >>> operand2[4:0];     // SRA (arithmetic)
+            4'b1001: result = (operand1 < operand2) ? 32'd1 : 32'd0;   // SLTU unsigned
+            default: result = 32'd0;
         endcase
-    end
 
-    // Zero flag asserted only when SUB result is zero
-    assign zero = (alu_operation == 4'b0110) && (result == 32'b0);
+        // Set zero flag: 1 if result is zero, else 0
+        zero = (result == 32'd0) ? 1'b1 : 1'b0;
+    end
 
 endmodule
