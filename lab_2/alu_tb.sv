@@ -1,14 +1,10 @@
 // ============================================================
 // alu_tb.sv
-// Randomized Testbench for ALU Module
-// University of Engineering and Technology, Lahore
 // EE-475L - Experiment 2, Task 2: ALU Testing
-//
 // Tests all 10 ALU operations from the student's operation table:
 //   - Section 1: Directed tests (known values, check exact result)
 //   - Section 2: Randomized tests (100 random input combinations)
 //   - Section 3: Zero flag specific tests
-//   Each test prints PASS or FAIL with operand and result values.
 // ============================================================
 
 `include "opcode.vh"
@@ -45,8 +41,6 @@ module alu_tb;
 
     // ----------------------------------------------------------
     // Task: apply_test
-    // Sets inputs, waits for combinational logic to settle (10ns),
-    // compares output with expected, prints PASS or FAIL.
     // ----------------------------------------------------------
     task apply_test(
         input [31:0]  op1,          // operand1 value
@@ -88,8 +82,6 @@ module alu_tb;
 
         // ======================================================
         // SECTION 1: DIRECTED TESTS FOR EACH OPERATION
-        // Each block tests one alu_operation code with hand-known
-        // values so we can verify correctness manually.
         // ======================================================
 
         // ------------------------------------------------------
@@ -229,8 +221,6 @@ module alu_tb;
         // ======================================================
         // SECTION 2: RANDOMIZED TESTS (100 iterations)
         // Generates random operands and a random valid operation
-        // code (0-9). A software reference model computes the
-        // expected result which is compared against the DUT.
         // ======================================================
         $display("\n[Randomized Tests - 100 iterations]");
         begin
@@ -279,9 +269,7 @@ module alu_tb;
         // AND with complement -> zero must be 1
         apply_test(32'hAAAAAAAA, 32'h55555555, 4'b0000, 32'h00000000, 1'b1);
 
-        // ======================================================
-        // SUMMARY
-        // ======================================================
+   
         $display("\n======================================================");
         $display("  SIMULATION COMPLETE");
         $display("  Total : %0d  |  Passed : %0d  |  Failed : %0d",
